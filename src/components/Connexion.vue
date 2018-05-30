@@ -56,7 +56,9 @@ export default {
 },
 methods: {
     signIn: function() {
-      firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(()=>{this.$router.replace("/home")}).catch((error) => {this.snackbar.active = true;});
+      firebase.auth().signInWithEmailAndPassword(this.email, this.password)
+      .then(()=>{this.$router.replace("/home")})
+      .catch((error) => {this.snackbar.active = true;});
 
   }}
 };

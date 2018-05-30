@@ -19,7 +19,7 @@
 			<v-text-field
 			slot="activator"
 			v-model="date"
-			label="Picker in menu"
+			label="Date de l'évenement"
 			prepend-icon="event"
 			readonly
 			></v-text-field>
@@ -62,7 +62,7 @@ export default {
 			adress: "",
 			category: "",
 			preciseCategory: "",
-			nbmax: 0,
+			nbmax: 10,
 			participants: [],
 			rules: {
 				required: (value) => !!value || 'Ce champ est obligatoire pour la création de l\'événement',

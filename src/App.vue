@@ -1,6 +1,6 @@
 <template>
 	<v-app>
-		<v-content>
+		<v-content v-if="!loading">
 			<v-toolbar>
        <v-toolbar-title v-if="userdata">Bonjour {{userdata.firstname}}</v-toolbar-title>
        <v-spacer></v-spacer>
@@ -48,6 +48,7 @@ export default {
         this.user = null;
         currentUser.data = null;
         this.userdata = null;
+        this.loading = false
       }
     });
   },

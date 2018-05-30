@@ -5,9 +5,9 @@
 			<p class="adress">{{event.adress}}</p><p class="date">{{event.date}}</p>
 			<img src=".././assets/tronc.jpeg" width="100%">
 			<p><b v-if="event.description" class="bold">Description : </b>{{event.description}}</p>
-			<v-btn block v-if="!event.subscribed" large color="primary">S'inscrire</v-btn>
-			<v-btn block v-if="event.subscribed" large>Se désinscrire</v-btn><br><br>
-
+			<p class="center">{{event.participants.length}} / {{event.nbmax}}</p>
+			<v-btn block v-if="!event.subscribed" :disabled="event.disabled" large color="primary" @click="subscribe(event)">S'inscrire</v-btn>
+			<v-btn block v-if="event.subscribed" :disabled="event.disabled" large @click="unsubscribe(event)">Se désinscrire</v-btn><br><br>
 			<v-snackbar :timeout="6000" bottom v-model="snackbar.active">
 				{{ snackbar.message }}
 			<v-btn flat color="primary" @click.native="snackbar.active = false">Close</v-btn>
@@ -18,7 +18,7 @@
 
 <script>
 import firebase from 'firebase';
-import { db } from '../main';
+import { db, currentUser } from '../main';
 
 export default {
   data: function () {
@@ -30,33 +30,93 @@ export default {
 			active: false,
 			message: "Il manque des informations pour créer l'évenement"
 		},
+		user: currentUser.profile,
+	    userdata: currentUser.data,
     }
   },
   created () {
-  	this.user = firebase.auth().currentUser;
+  	this.user = currentUser.profile;
 	if (this.user) {
 		db.collection("events").get()
 		.then((querySnapshot) => {
 			querySnapshot.forEach((doc) => {
 				let event = doc.data();
+				event.id = doc.id;
+				event.disabled = false;
 				event.subscribed = event.participants.indexOf(this.user.uid) >= 0;
-				console.log(event.subscribed)
+				if(event.useremail == this.user.email || event.participants.length >= event.nbmax){
+					event.disabled = true;
+				}
 				this.events.push(event);
 			})
 		});
-	}// else {
-//		console.log("pas d\'user")
-//	}
-	
+	}
 	
   },
   methods: {
   	subscribe: function(event){
-  		this.user = firebase.auth().currentUser;
+  		this.user = currentUser.profile;
   		if (this.user) {
-
+  			if(event.participants.length < event.nbmax){
+  				let newparticipants = event.participants;
+  				newparticipants.push(this.user.uid);
+  				db.collection("events").doc(event.id).set({
+  					useremail: event.useremail,
+					name: event.name,
+					date: event.date,
+					description: event.description,
+					adress: event.adress,
+					category: event.category,
+					preciseCategory: event.preciseCategory,
+					nbmax: event.nbmax,
+					participants: newparticipants
+  				});
+  				event.subscribed = true;
+  			} else {
+  				console.log('the event is full')
+  			}
   		} else {
-  			console.log('no user');
+  			console.log('no user or no user data');
+  		}
+  	},
+  	unsubscribe: function(event){
+  		this.user = currentUser.profile;
+  		console.log('entrée dans la fonction')
+  		if (this.user) {
+  			if(event.useremail != this.user.email){
+  				let newparticipants = [];
+  				console.log(event.participants)
+  				console.log(this.user.uid)
+  				for (var i = 0; i < event.participants.length; i++){
+  					if (event.participants[i] != this.user.uid){
+  						newparticipants.push(event.participants[i]);
+  					}
+  				}
+  				console.log(newparticipants)
+  				db.collection("events").doc(event.id).set({
+  					useremail: event.useremail,
+					name: event.name,
+					date: event.date,
+					description: event.description,
+					adress: event.adress,
+					category: event.category,
+					preciseCategory: event.preciseCategory,
+					nbmax: event.nbmax,
+					participants: newparticipants
+  				})
+  				.then(() => {
+					console.log("unsubscribed!");
+					event.participants = newparticipants;
+				})
+				.catch((error) => {
+					console.error("Error writing document: ", error);
+				});
+  				event.subscribed = false;
+  			} else {
+  				console.log('the user created the event')
+  			}
+  		} else {
+  			console.log('no user or no user data');
   		}
   	},
   	isIn: function(list, string){
@@ -98,5 +158,10 @@ export default {
 	.bold {
 		color: #FF3D00;
 		font-size: 130%;
+	}
+	.center {
+		text-align: center;
+		color: #FF3D00;
+		font-size: 150%
 	}
 </style>
