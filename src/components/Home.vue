@@ -21,3 +21,23 @@
     width: 50%;
   }
 </style>
+
+<script>
+import firebase from 'firebase';
+
+export default {
+  data () {
+    return {
+        user: firebase.auth().currentUser
+    }
+  },
+  mounted () {
+    firebase.auth().onAuthStateChanged((user) => {
+      this.user = user;
+      if(!user){this.$router.replace("/");}
+    });
+  },
+  methods: {}
+};
+
+</script>

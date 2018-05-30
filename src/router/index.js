@@ -5,6 +5,7 @@ import Connexion from '@/components/Connexion'
 import Register from '@/components/Register'
 import Home from '@/components/Home'
 import EventContainer from '@/components/EventContainer'
+import AddEvent from '@/components/AddEvent'
 
 Vue.use(Router)
 
@@ -34,6 +35,11 @@ export default new Router({
       path: '/eventcontainer',
       name: 'EventContainer',
       component: EventContainer
+    },
+    {
+      path: '/addevent',
+      name: 'AddEvent',
+      component: AddEvent
     }
   ]
 })

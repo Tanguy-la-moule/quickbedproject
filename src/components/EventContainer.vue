@@ -1,67 +1,73 @@
 <template>
-	<div class="main">
-		<div class="container">
-			<v-btn @click="getEvents">Afficher les évènements</v-btn>
-			<div v-if="display" v-for="event in events">
-				<div class="space"></div>
-				<div><font class="bigtitle" size="+4">{{event[1]}}</font><font class="date" size="+4">{{event[2]}}</font></div><br>
-				<img src=".././assets/tronc.jpeg" class="sportimage"><br><br>
-				<font class="description" size="+2"><b class="bold">Description : </b>{{event[4]}}</font><br><br>
-				<font size="+2"><b class="bold">Adresse : </b>{{event[3]}}</font><br><br>
-				<v-btn block large class="button" v-if="subscription[event[0]]">S'inscrire</v-btn>
-				<v-btn block large class="button2" v-if="!subscription[event[0]]">Se désinscrire</v-btn>
-				<div class="space"></div>
-				<hr width="75%" color="#FF3D00"><br><br>
-			</div>
+	<div>
+		<div v-for="event in events" class="container">
+			<h1 class="bigtitle">{{event.name}}</h1><br><br>
+			<p class="adress">{{event.adress}}</p><p class="date">{{event.date}}</p>
+			<img src=".././assets/tronc.jpeg" width="100%">
+			<p><b v-if="event.description" class="bold">Description : </b>{{event.description}}</p>
+			<v-btn block v-if="!event.subscribed" large color="primary">S'inscrire</v-btn>
+			<v-btn block v-if="event.subscribed" large>Se désinscrire</v-btn><br><br>
+
+			<v-snackbar :timeout="6000" bottom v-model="snackbar.active">
+				{{ snackbar.message }}
+			<v-btn flat color="primary" @click.native="snackbar.active = false">Close</v-btn>
+		</v-snackbar>
 		</div>
 	</div>
 </template>
 
 <script>
+import firebase from 'firebase';
+import { db } from '../main';
+
 export default {
   data: function () {
     return {
+    	user: firebase.auth().currentUser,
     	events: [],
     	display: false,
-    	subscription: [false, true, false],
-    	link: ".././assets/beachvolley.jpg",
-        event0: [
-          '0',
-          'Basket',
-          '01/06/2018',
-          '22 Rue Duperré, 75009 Paris',
-          'Tournoi de basket avec les résidents de l\'établissement, rencontre avec l\'équipe de Paris 13',
-          ".././assets/basket.jpg",
-          'Centre Humanitaire Paris-Nord',
-          true
-        ],
-        event1: [
-          '1',
-          'Beach volley',
-          '05/06/2018',
-          'Centre Sportif Louis Lumière, 30 Rue Louis Lumière, 75020 Paris',
-          'Matchs de beach volley ouvert à tous',
-          ".././assets/beachvolley.jpg",
-          'Centre Humanitaire Paris-Sud',
-          false
-        ],
-        event2: [
-          '2',
-          'Football',
-          '08/06/2018',
-          '22 Rue Duperré, 75009 Paris',
-          'Matchs de football',
-          ".././assets/football.jpg",
-          'Centre Humanitaire Paris-Nord',
-          true
-        ]
+        snackbar: {
+			active: false,
+			message: "Il manque des informations pour créer l'évenement"
+		},
     }
   },
+  created () {
+  	this.user = firebase.auth().currentUser;
+	if (this.user) {
+		db.collection("events").get()
+		.then((querySnapshot) => {
+			querySnapshot.forEach((doc) => {
+				let event = doc.data();
+				event.subscribed = event.participants.indexOf(this.user.uid) >= 0;
+				console.log(event.subscribed)
+				this.events.push(event);
+			})
+		});
+	}// else {
+//		console.log("pas d\'user")
+//	}
+	
+	
+  },
   methods: {
-  	getEvents: function() {
-  		this.display = !this.display || this.display;
-      	this.events = [this.event0, this.event1, this.event2];
-      }
+  	subscribe: function(event){
+  		this.user = firebase.auth().currentUser;
+  		if (this.user) {
+
+  		} else {
+  			console.log('no user');
+  		}
+  	},
+  	isIn: function(list, string){
+  		let result = false;
+  		for (item in list){
+  			if (item === string){
+  				result = true
+  			}
+  		}
+  		return result;
+  	}
   }
 };
 
@@ -84,21 +90,13 @@ export default {
 	.date {
 		float: right;
 		color: #FF3D00;
+		font-size: 120%;
 	}
-	.sportimage {
-		width: 100%;
+	.adress {
+		float: left;
 	}
 	.bold {
 		color: #FF3D00;
-	}
-	.button {
-		background-color: #FF3D00;
-		color: white;
-		font-size: 150%;
-	}
-	.button2 {
-		background-color: white;
-		color: #FF3D00;
-		font-size: 150%;
+		font-size: 130%;
 	}
 </style>

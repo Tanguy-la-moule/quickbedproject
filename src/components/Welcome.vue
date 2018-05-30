@@ -4,29 +4,45 @@
 	      <div class="p200"></div>
 	      <img src=".././assets/logo.jpeg">
 	      <div class="p20"></div>
-	      <v-btn large center class="button" to="/connexion">Se connecter</v-btn>
-		  <v-btn large center class="button" to="/register">Créer un compte</v-btn>
+	      <v-btn large center color="primary" to="/connexion">Se connecter</v-btn><br>
+		    <v-btn large center color="primary" to="/register">Créer un compte</v-btn>
 	    </div>
 	 </div>
 </template>
     
+<script>
+import firebase from 'firebase';
 
+export default {
+  data () {
+    return {
+        user: firebase.auth().currentUser,
+        loggedin: false
+    }
+  },
+  created () {
+    firebase.auth().onAuthStateChanged((user) => {
+    	this.user = user;
+    	if(user){
+    		this.loggedin = true;
+    		this.$router.replace("/home");
+    	}
+    	else {this.loggedin = false;}
+    });
+  },
+  methods: {}
+};
+
+</script>
 
 <style>
   .welcome {
     text-align: center;
-    width: 100%;
-  }
-  .button {
-  	background-color: #FF3D00;
-  	color: white;
-  	width: 50%;
   }
   .p200 {
-    height: 200px;
+    height: 100px;
   }
   .p20 {
   	height: 20px;
   }
-
 </style>
