@@ -5,7 +5,8 @@
        <v-toolbar-title v-if="userdata">Bonjour {{userdata.firstname}}</v-toolbar-title>
        <v-spacer></v-spacer>
        <v-toolbar-items class="hidden-sm-and-down">
-        <v-btn flat v-if="loggedin" to='/addevent'>Ajouter un évenement</v-btn>
+        <v-btn flat v-if="admin" to='/addevent'>Ajouter un évenement</v-btn>
+        <v-btn flat v-if="admin" to='/admineventcontainer'>Gérer ses évenements</v-btn>
         <v-btn flat v-if="loggedin" @click="logOut">Se déconnecter</v-btn>
         <v-btn flat v-if="!loggedin" to="/connexion">Se connecter</v-btn>
       </v-toolbar-items>
@@ -25,7 +26,8 @@ export default {
       user: currentUser.profile,
       loggedin: currentUser.logged,
       userdata: currentUser.data,
-      loading: true
+      loading: true,
+      admin: false
     }
   },
   created () {
@@ -38,6 +40,7 @@ export default {
           this.user = user;
     			currentUser.data = doc.data();
           this.userdata = doc.data();
+          this.admin = this.userdata.admin;
           this.loading = false;
     		});
     	}
@@ -48,7 +51,8 @@ export default {
         this.user = null;
         currentUser.data = null;
         this.userdata = null;
-        this.loading = false
+        this.admin = false;
+        this.loading = false;
       }
     });
   },

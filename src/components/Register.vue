@@ -147,6 +147,7 @@ export default {
 					db.collection("users").doc(this.user.uid).set({
 					    email: this.email,
 					    name: this.name,
+					    admin: false,
 					    firstname: this.firstname,
 					    phonenb: this.phonenb,
 					    birthdate: this.birthdate,

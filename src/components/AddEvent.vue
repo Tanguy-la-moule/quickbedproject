@@ -129,7 +129,7 @@ export default {
 							adress: this.adress,
 							category: this.category,
 							preciseCategory: this.preciseCategory,
-							nbmax: this.nbmax + 1,
+							nbmax: this.nbmax,
 							participants: this.participants
 						})
 						.then(() => {
