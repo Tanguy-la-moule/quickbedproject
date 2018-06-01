@@ -58,8 +58,9 @@ export default {
   },
   methods: {
   	logOut: function(){
-  		firebase.auth().signOut().then(function() {
+  		firebase.auth().signOut().then(() => {
         console.log('Signed Out');
+        this.$router.replace('/')
       }, function(error) {
         console.error('Sign Out Error', error);
       });

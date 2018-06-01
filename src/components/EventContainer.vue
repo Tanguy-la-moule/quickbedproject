@@ -71,6 +71,9 @@ export default {
 					nbmax: event.nbmax,
 					participants: newparticipants
   				});
+  				if(event.useremail == this.user.email || event.participants.length >= event.nbmax){
+					event.disabled = true;
+				}
   				event.subscribed = true;
   			} else {
   				console.log('the event is full')
@@ -81,7 +84,6 @@ export default {
   	},
   	unsubscribe: function(event){
   		this.user = currentUser.profile;
-  		console.log('entrée dans la fonction')
   		if (this.user) {
   			if(event.useremail != this.user.email){
   				let newparticipants = [];
@@ -92,7 +94,6 @@ export default {
   						newparticipants.push(event.participants[i]);
   					}
   				}
-  				console.log(newparticipants)
   				db.collection("events").doc(event.id).set({
   					useremail: event.useremail,
 					name: event.name,
@@ -107,6 +108,7 @@ export default {
   				.then(() => {
 					console.log("unsubscribed!");
 					event.participants = newparticipants;
+					console.log("unsubscribed");
 				})
 				.catch((error) => {
 					console.error("Error writing document: ", error);

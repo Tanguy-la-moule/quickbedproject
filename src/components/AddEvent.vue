@@ -120,7 +120,6 @@ export default {
 				if (this.date){
 					if (this.preciseCategory){
 						this.user = firebase.auth().currentUser;
-						this.participants.push(this.user.uid);
 						db.collection("events").add({
 							useremail: this.user.email,
 							name: this.name,

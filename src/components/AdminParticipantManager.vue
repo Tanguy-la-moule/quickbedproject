@@ -1,7 +1,9 @@
 <template>
 	<div>
 		<div v-for="participant in users" class="container">
-			<p>{{participant}}</p>
+			<span class="name">{{participant.firstname}} {{participant.name}}  {{participant.birthdate}}</span>
+			<v-btn large class="button" color="primary" @click="quick(participant)">Supprimer l'utilisateur</v-btn>
+
 		</div>
 	</div>
 </template>
@@ -47,6 +49,32 @@ export default {
 	
   },
   methods: {
+  	quick: function (participant){
+		let newparticipants = [];
+		for (var i = 0; i < this.users.length; i++){
+			if (participant.uid != this.users[i].uid){
+				newparticipants.push(event.participants[i]);
+				}
+			}
+			db.collection("events").doc(event.id).set({
+				useremail: event.useremail,
+				name: event.name,
+				date: event.date,
+				description: event.description,
+				adress: event.adress,
+				category: event.category,
+				preciseCategory: event.preciseCategory,
+				nbmax: event.nbmax,
+				participants: newparticipants
+			})
+			.then(() => {
+			console.log("unsubscribed!");
+			event.participants = newparticipants;
+		})
+		.catch((error) => {
+			console.error("Error writing document: ", error);
+		});
+  	},
   	isIn: function(list, string){
   		let result = false;
   		for (item in list){
@@ -62,34 +90,11 @@ export default {
 </script>
 
 <style>
-	.main {
-		width: 100%;
+	.name {
+		font-size: 200%;
+
 	}
-	.container {
-		width: 50%;
-	}
-	.space {
-		height: 50px;
-	}
-	.bigtitle {
-		float: left;
-		color: #FF3D00;
-	}
-	.date {
+	.button {
 		float: right;
-		color: #FF3D00;
-		font-size: 120%;
-	}
-	.adress {
-		float: left;
-	}
-	.bold {
-		color: #FF3D00;
-		font-size: 130%;
-	}
-	.center {
-		text-align: center;
-		color: #FF3D00;
-		font-size: 150%
 	}
 </style>
